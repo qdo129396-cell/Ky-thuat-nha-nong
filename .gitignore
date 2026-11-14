@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+backend/uploads/
+*.log
+.DS_Store
+.tools/
+/.vs/
+*.tsbuildinfo
+/NongKyCommunity.Web/bin/
+/NongKyCommunity.Web/obj/
+/NongKyCommunity.Web/kiem-tra-build/
+/NongKyCommunity.Web/wwwroot/uploads/

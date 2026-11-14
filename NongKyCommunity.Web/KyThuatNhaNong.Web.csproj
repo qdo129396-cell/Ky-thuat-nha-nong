@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>KyThuatNhaNong.Web</AssemblyName>
+    <RootNamespace>KyThuatNhaNong.Web</RootNamespace>
+    <Product>Kỹ Thuật Nhà Nông</Product>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.29" />
+  </ItemGroup>
+
+</Project>

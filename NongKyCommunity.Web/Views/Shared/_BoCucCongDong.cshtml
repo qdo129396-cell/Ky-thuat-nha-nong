@@ -1,0 +1,3 @@
+@{ Layout = "_Layout"; ViewData["CommunityFullWidth"] = true; }
+<section class="community-app"><div class="community-grid">@await Component.InvokeAsync("CommunityLeftSidebar")<main class="community-feed">@RenderBody()</main>@await Component.InvokeAsync("CommunityRightSidebar")</div></section>
+@section Scripts { @await RenderSectionAsync("Scripts", required: false) }

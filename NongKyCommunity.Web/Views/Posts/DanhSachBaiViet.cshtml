@@ -1,0 +1,75 @@
+@model IEnumerable<NongKyCommunity.Web.Models.Post>
+@using NongKyCommunity.Web.Models
+@{
+    Layout = "_BoCucCongDong";
+    ViewData["Title"] = "Bài viết";
+    var categories = ViewBag.Categories as IEnumerable<Category> ?? [];
+    var currentPage = (int)(ViewBag.Page ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+    var likeCounts = ViewBag.LikeCounts as IDictionary<int, int> ?? new Dictionary<int, int>();
+    var commentCounts = ViewBag.CommentCounts as IDictionary<int, int> ?? new Dictionary<int, int>();
+    var likedPostIds = ViewBag.LikedPostIds as IEnumerable<int> ?? [];
+    var currentUserAvatar = ViewBag.CurrentUserAvatar as string;
+}
+
+<header class="community-heading">
+    <div><p class="eyebrow">BÀI VIẾT CỘNG ĐỒNG</p><h1>Kinh nghiệm nhà nông</h1><p>Kiến thức và câu chuyện thực tế từ cộng đồng.</p></div>
+    <a class="button primary" asp-action="Create">+ Viết bài</a>
+</header>
+<a class="post-composer" asp-action="Create">
+    @if (!string.IsNullOrWhiteSpace(currentUserAvatar))
+    {
+        <img class="avatar avatar-image" src="@currentUserAvatar" alt="Ảnh đại diện của bạn" />
+    }
+    else
+    {
+        <span class="avatar">@(User.Identity?.Name?[..1].ToUpper() ?? "N")</span>
+    }
+    <span>Bạn muốn chia sẻ kinh nghiệm gì hôm nay?</span><b>Viết bài</b>
+</a>
+<form method="get" asp-action="Index" class="feed-toolbar">
+    <input type="hidden" name="category" value="@ViewBag.Category" />
+    <input name="search" value="@ViewBag.Query" placeholder="Tìm kiếm bài viết..." aria-label="Tìm kiếm bài viết" />
+    <button type="submit">Tìm kiếm</button>
+</form>
+<nav class="feed-filters" aria-label="Lọc theo danh mục">
+    <a class="@(ViewBag.Category is null ? "active" : "")" asp-route-search="@ViewBag.Query">Tất cả</a>
+    @foreach (var category in categories)
+    {
+        <a class="@(ViewBag.Category == category.Slug ? "active" : "")" asp-route-category="@category.Slug" asp-route-search="@ViewBag.Query">@category.Name</a>
+    }
+</nav>
+
+@foreach (var post in Model)
+{
+    var isAdminPost = post.Author.Role == UserRole.Admin;
+    <article class="social-post facebook-post @(isAdminPost ? "admin-post" : "")" id="bai-viet-@post.Id">
+        <header class="social-post-header">
+            @if (!string.IsNullOrWhiteSpace(post.Author.AvatarUrl))
+            {
+                <img class="avatar avatar-image @(isAdminPost ? "admin-avatar" : "")" src="@post.Author.AvatarUrl" alt="Ảnh đại diện @post.Author.FullName" />
+            }
+            else
+            {
+                <span class="avatar @(isAdminPost ? "admin-avatar" : "")">@post.Author.FullName[..1].ToUpper()</span>
+            }
+            <div>
+                <a class="author-link" asp-controller="Profile" asp-action="Index" asp-route-id="@post.AuthorId">@post.Author.FullName @if (isAdminPost) { <span class="admin-badge">Quản trị viên</span> }</a>
+                <small>@post.CreatedAt.ToString("dd/MM/yyyy") · <em>@post.Category.Name</em></small>
+            </div>
+        </header>
+        <div class="social-post-body"><h2><a asp-action="Details" asp-route-slug="@post.Slug">@post.Title</a></h2>@if (!string.IsNullOrWhiteSpace(post.Excerpt)) { <p>@post.Excerpt</p> }<a asp-action="Details" asp-route-slug="@post.Slug">Xem thêm</a></div>
+        @if (!string.IsNullOrWhiteSpace(post.ImageUrl)) { <img class="social-post-media" src="@post.ImageUrl" alt="@post.Title" /> }
+        <div class="social-post-stats"><span data-like-count="@post.Id">♥ @(likeCounts.TryGetValue(post.Id, out var likes) ? likes : 0) lượt thích</span><a asp-action="Details" asp-route-slug="@post.Slug">@(commentCounts.TryGetValue(post.Id, out var comments) ? comments : 0) bình luận</a></div>
+        <footer class="social-post-actions">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <form asp-action="ToggleLike" method="post" data-async="like"><input type="hidden" name="id" value="@post.Id" /><input type="hidden" name="returnSlug" value="@post.Slug" /><input type="hidden" name="returnUrl" value="@($"{Context.Request.Path}{Context.Request.QueryString}#bai-viet-{post.Id}")" /><button class="feed-action">@(likedPostIds.Contains(post.Id) ? "♥ Đã thích" : "♡ Thích")</button></form>
+            }
+            else { <a asp-controller="Account" asp-action="Login">♡ Thích</a> }
+            <a asp-action="Details" asp-route-slug="@post.Slug">💬 Bình luận</a><a asp-action="Details" asp-route-slug="@post.Slug">Xem chi tiết</a>
+        </footer>
+    </article>
+}
+@if (!Model.Any()) { <div class="feed-empty"><h2>Không tìm thấy bài viết phù hợp.</h2><p>Thử từ khóa khác hoặc bỏ bớt bộ lọc.</p></div> }
+@if (totalPages > 1) { <nav class="feed-pagination" aria-label="Phân trang bài viết"><a class="@(currentPage <= 1 ? "disabled" : "")" asp-route-search="@ViewBag.Query" asp-route-category="@ViewBag.Category" asp-route-page="@(currentPage - 1)">← Trước</a><b>@currentPage</b><a class="@(currentPage >= totalPages ? "disabled" : "")" asp-route-search="@ViewBag.Query" asp-route-category="@ViewBag.Category" asp-route-page="@(currentPage + 1)">Sau →</a></nav> }

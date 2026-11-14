@@ -1,0 +1,16 @@
+@model NongKyCommunity.Web.ViewModels.TrangCaNhanViewModel
+@using NongKyCommunity.Web.Models
+@{ Layout = "_BoCucCongDong"; ViewData["Title"] = $"Hồ sơ {Model.User.FullName}"; var isAdmin = Model.User.Role == UserRole.Admin; }
+
+<section class="profile-page @(isAdmin ? "profile-admin" : "")">
+    <header class="profile-hero">
+        @if (!string.IsNullOrWhiteSpace(Model.User.AvatarUrl)) { <img class="avatar profile-avatar @(isAdmin ? "admin-avatar" : "")" src="@Model.User.AvatarUrl" alt="Ảnh đại diện @Model.User.FullName" /> } else { <span class="avatar profile-avatar @(isAdmin ? "admin-avatar" : "")">@Model.User.FullName[..1].ToUpper()</span> }
+        <div><h1>@Model.User.FullName @if (isAdmin) { <span class="admin-badge">Quản trị viên</span> }</h1><p>@(isAdmin ? "Tài khoản quản trị chính thức của Kỹ Thuật Nhà Nông." : Model.User.Bio)</p><small>Tham gia từ @Model.User.CreatedAt.ToString("MM/yyyy")</small></div>
+        @if (Model.IsOwner) { <a class="button primary" asp-action="Edit">Chỉnh sửa hồ sơ</a> }
+        else if (User.Identity?.IsAuthenticated == true) { <form asp-action="ToggleFollow" method="post" data-async="follow"><input type="hidden" name="id" value="@Model.User.Id" /><button class="button primary">@(Model.IsFollowing ? "Đang theo dõi" : "Theo dõi")</button></form> }
+    </header>
+    <div class="profile-stats"><div><strong>@Model.Posts.Count</strong><span>Bài viết</span></div><div><strong data-followers>@Model.Followers</strong><span>Người theo dõi</span></div><div><strong>@Model.Following</strong><span>Đang theo dõi</span></div><div><strong>@Model.TotalLikes</strong><span>Lượt tim</span></div></div>
+    @if (!string.IsNullOrWhiteSpace(Model.User.FarmingArea) || !string.IsNullOrWhiteSpace(Model.User.Experience)) { <section class="profile-info"><p><strong>Khu vực canh tác:</strong> @Model.User.FarmingArea</p><p><strong>Kinh nghiệm:</strong> @Model.User.Experience</p></section> }
+    <h2>Bài viết của @Model.User.FullName</h2>
+    <div class="profile-posts">@foreach (var post in Model.Posts) { <article><small>@post.Category.Name · @post.CreatedAt.ToString("dd/MM/yyyy") @if (!post.IsPublished) { <span class="post-status draft">Bản nháp</span> }</small><h3><a asp-controller="Posts" asp-action="Details" asp-route-slug="@post.Slug">@post.Title</a></h3><p>@post.Excerpt</p>@if (Model.IsOwner) { <div class="profile-post-tools">@if (!post.IsPublished) { <form asp-controller="Posts" asp-action="Publish" method="post"><input type="hidden" name="id" value="@post.Id" /><button class="button primary">Xuất bản ngay</button></form> }<a asp-controller="Posts" asp-action="Edit" asp-route-id="@post.Id">Chỉnh sửa</a><form asp-controller="Posts" asp-action="Delete" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa bài viết này?');"><input type="hidden" name="id" value="@post.Id" /><button class="danger-link">Xóa</button></form></div> }</article> }</div>
+</section>

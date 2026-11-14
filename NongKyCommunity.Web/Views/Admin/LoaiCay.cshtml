@@ -1,0 +1,8 @@
+@model IEnumerable<NongKyCommunity.Web.Models.Crop>
+@{ ViewData["Title"] = "Loại cây"; }
+
+<section class="admin-page"><h1>Quản lý loại cây trồng</h1>
+    <nav class="admin-nav"><a asp-action="Index">Tổng quan</a><a asp-action="Users">Người dùng</a><a asp-action="Posts">Bài viết</a><a asp-action="Categories">Danh mục</a><a asp-action="Comments">Bình luận</a></nav>
+    <form asp-action="AddCrop" method="post" class="admin-search"><input name="name" required placeholder="Tên loại cây" /><input name="description" placeholder="Mô tả ngắn" /><button>Thêm loại cây</button></form>
+    <table class="admin-table"><thead><tr><th>Tên</th><th>Mô tả</th><th>Trạng thái</th><th></th></tr></thead><tbody>@foreach (var item in Model) { <tr><td>@item.Name</td><td>@item.Description</td><td>@(item.IsActive ? "Đang dùng" : "Đã ẩn")</td><td><form asp-action="ToggleCrop" method="post"><input type="hidden" name="id" value="@item.Id" /><button>@(item.IsActive ? "Ẩn" : "Bật lại")</button></form></td></tr> }</tbody></table>
+</section>

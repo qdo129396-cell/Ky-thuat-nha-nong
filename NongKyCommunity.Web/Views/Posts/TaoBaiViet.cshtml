@@ -1,0 +1,16 @@
+@model NongKyCommunity.Web.Models.Post
+@{ Layout = "_BoCucCongDong"; ViewData["Title"] = "Viết bài"; var categories = ViewBag.Categories as IEnumerable<NongKyCommunity.Web.Models.Category> ?? []; }
+
+<section class="community-form"><h1>Chia sẻ kinh nghiệm</h1>
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="form-error"></div>
+        <label asp-for="Title">Tiêu đề</label><input asp-for="Title" />
+        <label asp-for="Excerpt">Mô tả ngắn</label><textarea asp-for="Excerpt" rows="3"></textarea>
+        <label asp-for="CategoryId">Danh mục</label><select asp-for="CategoryId">@foreach (var category in categories) { <option value="@category.Id">@category.Name</option> }</select>
+        <label asp-for="Content">Nội dung</label><textarea asp-for="Content" rows="12"></textarea>
+        <label for="image">Hình ảnh thực tế</label><input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" /><small>Chấp nhận JPG, PNG, WebP; tối đa 5 MB.</small>
+        <label for="video">Video thực tế</label><input id="video" name="video" type="file" accept="video/mp4,video/webm" /><small>Chấp nhận MP4, WebM; tối đa 50 MB.</small>
+        <label class="publish-choice"><input asp-for="IsPublished" /><span><strong>Xuất bản ngay</strong><small>Bỏ chọn nếu bạn muốn lưu bản nháp và xuất bản sau trong mục “Bài viết của tôi”.</small></span></label>
+        <button class="button primary">Đăng bài viết</button>
+    </form>
+</section>

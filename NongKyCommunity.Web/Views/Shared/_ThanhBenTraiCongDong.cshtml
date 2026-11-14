@@ -1,0 +1,11 @@
+@{ var action = ViewContext.RouteData.Values["action"]?.ToString(); var controller = ViewContext.RouteData.Values["controller"]?.ToString(); }
+<aside class="community-left">
+    <div class="side-profile"><span class="avatar avatar-lg">@(User.Identity?.IsAuthenticated == true ? User.Identity?.Name?[..1].ToUpper() : "N")</span><strong>@(User.Identity?.IsAuthenticated == true ? User.Identity?.Name : "Nhà nông")</strong><small>Thành viên cộng đồng</small></div>
+    <nav>
+        <a asp-controller="Home" asp-action="Index">Trang chủ</a>
+        <a class="@(controller == "Posts" && action is "Index" or "Details" ? "active" : "")" asp-controller="Posts" asp-action="Index">Bài viết</a>
+        @if (User.Identity?.IsAuthenticated == true) { <a class="@(controller == "Profile" ? "active" : "")" asp-controller="Profile" asp-action="MyProfile">Hồ sơ của tôi</a> }
+        <a class="@(action == "Create" ? "active" : "")" asp-controller="Posts" asp-action="Create">Viết bài</a>
+        @if (User.IsInRole("Admin")) { <a asp-controller="Admin" asp-action="Index">Quản trị</a> }
+    </nav>
+</aside>

@@ -1,0 +1,16 @@
+@model NongKyCommunity.Web.ViewModels.BangDieuKhienQuanTriViewModel
+@{ ViewData["Title"] = "Quản trị"; }
+
+<section class="admin-page">
+    <h1>Quản trị hệ thống</h1>
+    <nav class="admin-nav" aria-label="Các mục quản trị">
+        <a asp-action="Index">Tổng quan</a><a asp-action="Users">Người dùng</a><a asp-action="Posts">Bài viết</a><a asp-action="Comments">Bình luận</a><a asp-action="Reports">Báo cáo</a><a asp-action="Categories">Danh mục</a><a asp-action="Crops">Loại cây</a>
+    </nav>
+    <div class="admin-stats">
+        <div><strong>@Model.Users</strong><span>Người dùng</span></div><div><strong>@Model.Posts</strong><span>Bài viết</span></div><div><strong>@Model.Comments</strong><span>Bình luận</span></div><div><strong>@Model.Categories</strong><span>Danh mục</span></div><div><strong>@Model.Crops</strong><span>Loại cây</span></div>
+    </div>
+    <h2>Bài viết mới</h2>
+    <table class="admin-table"><thead><tr><th>Tiêu đề</th><th>Tác giả</th><th>Ngày đăng</th></tr></thead><tbody>@foreach (var post in Model.RecentPosts) { <tr><td>@post.Title</td><td>@post.Author.FullName</td><td>@post.CreatedAt.ToString("dd/MM/yyyy")</td></tr> }</tbody></table>
+    <h2>Người dùng mới</h2>
+    <table class="admin-table"><thead><tr><th>Họ tên</th><th>Email</th><th>Ngày tạo</th></tr></thead><tbody>@foreach (var user in Model.RecentUsers) { <tr><td>@user.FullName</td><td>@user.Email</td><td>@user.CreatedAt.ToString("dd/MM/yyyy")</td></tr> }</tbody></table>
+</section>

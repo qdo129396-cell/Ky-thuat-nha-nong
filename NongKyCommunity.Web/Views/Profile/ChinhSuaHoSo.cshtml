@@ -1,0 +1,16 @@
+@model NongKyCommunity.Web.Models.AppUser
+@{ Layout = "_BoCucCongDong"; ViewData["Title"] = "Chỉnh sửa hồ sơ"; }
+<section class="community-form">
+    <h1>Chỉnh sửa hồ sơ cá nhân</h1>
+    <p>Cập nhật ảnh đại diện và phần giới thiệu của riêng bạn.</p>
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="form-error"></div>
+        <label for="fullName">Tên hiển thị</label><input id="fullName" name="fullName" value="@Model.FullName" maxlength="100" required />
+        <label for="bio">Chú thích / giới thiệu</label><textarea id="bio" name="bio" maxlength="1000" rows="4" placeholder="Giới thiệu ngắn về bạn">@Model.Bio</textarea>
+        <label for="farmingArea">Khu vực canh tác</label><input id="farmingArea" name="farmingArea" value="@Model.FarmingArea" maxlength="150" placeholder="Ví dụ: Đà Lạt, Lâm Đồng" />
+        <label for="experience">Kinh nghiệm sản xuất</label><textarea id="experience" name="experience" maxlength="500" rows="3">@Model.Experience</textarea>
+        <label for="avatar">Ảnh đại diện</label><input id="avatar" name="avatar" type="file" accept="image/jpeg,image/png,image/webp" />
+        <small>Chấp nhận JPG, PNG, WebP; tối đa 5 MB.</small>
+        <button class="button primary">Lưu hồ sơ</button>
+    </form>
+</section>

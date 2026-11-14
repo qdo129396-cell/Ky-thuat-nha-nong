@@ -1,0 +1,9 @@
+@model IEnumerable<NongKyCommunity.Web.Models.PostReport>
+@{ ViewData["Title"] = "Báo cáo bài viết"; var resolved = ViewBag.Resolved is true; }
+
+<section class="admin-page"><h1>Báo cáo bài viết</h1>
+    <nav class="admin-nav"><a asp-action="Index">Tổng quan</a><a asp-action="Users">Người dùng</a><a asp-action="Posts">Bài viết</a><a asp-action="Comments">Bình luận</a><a asp-action="Categories">Danh mục</a><a asp-action="Crops">Loại cây</a></nav>
+    <p><a class="button @(resolved ? "" : "primary")" asp-action="Reports">Chưa xử lý</a> <a class="button @(resolved ? "primary" : "")" asp-action="Reports" asp-route-resolved="true">Đã xử lý</a></p>
+    @if (!Model.Any()) { <p>Không có báo cáo @(resolved ? "đã xử lý" : "chờ xem xét").</p> }
+    else { <table class="admin-table"><thead><tr><th>Bài viết</th><th>Người báo cáo</th><th>Lý do</th><th>Thời gian</th><th></th></tr></thead><tbody>@foreach (var report in Model) { <tr><td><a asp-controller="Posts" asp-action="Details" asp-route-slug="@report.Post.Slug">@report.Post.Title</a></td><td>@report.User.FullName</td><td>@report.Reason</td><td>@report.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td><td>@if (!report.IsResolved) { <form asp-action="ResolveReport" method="post"><input type="hidden" name="id" value="@report.Id" /><button>Đánh dấu đã xử lý</button></form> }</td></tr> }</tbody></table> }
+</section>

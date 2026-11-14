@@ -1,0 +1,9 @@
+@model IEnumerable<NongKyCommunity.Web.Models.Category>
+@{ ViewData["Title"] = "Danh mục"; }
+
+<section class="admin-page"><h1>Quản lý danh mục</h1>
+    <nav class="admin-nav"><a asp-action="Index">Tổng quan</a><a asp-action="Users">Người dùng</a><a asp-action="Posts">Bài viết</a><a asp-action="Comments">Bình luận</a><a asp-action="Crops">Loại cây</a></nav>
+    @if (TempData["Error"] is string error) { <p class="form-error">@error</p> }
+    <form asp-action="AddCategory" method="post" class="admin-search"><input name="name" required placeholder="Tên danh mục mới" /><button>Thêm danh mục</button></form>
+    <table class="admin-table"><thead><tr><th>Tên</th><th>Slug</th><th></th></tr></thead><tbody>@foreach (var item in Model) { <tr><td>@item.Name</td><td>@item.Slug</td><td><form asp-action="DeleteCategory" method="post" onsubmit="return confirm('Xóa danh mục này?');"><input type="hidden" name="id" value="@item.Id" /><button class="admin-danger">Xóa</button></form></td></tr> }</tbody></table>
+</section>

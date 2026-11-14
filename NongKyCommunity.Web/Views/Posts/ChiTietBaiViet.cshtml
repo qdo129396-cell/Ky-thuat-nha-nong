@@ -1,0 +1,53 @@
+@model NongKyCommunity.Web.Models.Post
+@using NongKyCommunity.Web.Models
+@using System.Security.Claims
+@{
+    Layout = "_BoCucCongDong";
+    ViewData["Title"] = Model.Title;
+    var likeCount = (int)(ViewBag.LikeCount ?? 0);
+    var isLiked = ViewBag.IsLiked is true;
+    var isAdminPost = Model.Author.Role == UserRole.Admin;
+    var currentUserId = int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : 0;
+    var canFollow = User.Identity?.IsAuthenticated == true && currentUserId != Model.AuthorId;
+}
+<div class="post-detail-layout">
+    <article class="post-detail @(isAdminPost ? "admin-post" : "")">
+        <header class="post-detail-header">
+            @if (!string.IsNullOrWhiteSpace(Model.Author.AvatarUrl))
+            {
+                <img class="avatar avatar-image @(isAdminPost ? "admin-avatar" : "")" src="@Model.Author.AvatarUrl" alt="Ảnh đại diện @Model.Author.FullName" />
+            }
+            else { <span class="avatar @(isAdminPost ? "admin-avatar" : "")">@Model.Author.FullName[..1].ToUpper()</span> }
+            <div><a class="author-link" asp-controller="Profile" asp-action="Index" asp-route-id="@Model.AuthorId">@Model.Author.FullName @if (isAdminPost) { <span class="admin-badge">Quản trị viên</span> }</a><small>@Model.CreatedAt.ToString("dd/MM/yyyy") · @Model.Category.Name</small></div>
+        </header>
+        <h1>@Model.Title</h1><p class="lead">@Model.Excerpt</p>
+        @if (!string.IsNullOrWhiteSpace(Model.ImageUrl)) { <img class="post-detail-image" src="@Model.ImageUrl" alt="@Model.Title" /> }
+        @if (!string.IsNullOrWhiteSpace(Model.VideoUrl)) { <video class="post-video" controls preload="metadata" src="@Model.VideoUrl"></video> }
+        <div class="post-content">@Model.Content</div>
+        <div class="post-management">@if (ViewBag.CanEdit is true) { <a asp-action="Edit" asp-route-id="@Model.Id">Chỉnh sửa</a> }@if (ViewBag.CanDelete is true) { <form asp-action="Delete" method="post"><input type="hidden" name="id" value="@Model.Id" /><button class="danger-link">Xóa bài</button></form> }@if (ViewBag.CanHide is true) { <form asp-action="Hide" method="post"><input type="hidden" name="id" value="@Model.Id" /><button class="danger-link">Ẩn bài</button></form> }</div>
+    </article>
+    <aside class="post-action-rail" aria-label="Tương tác bài viết">
+        @if (canFollow) { <form asp-controller="Profile" asp-action="ToggleFollow" method="post" data-async="follow"><input type="hidden" name="id" value="@Model.AuthorId" /><button class="rail-action rail-follow" data-follow-button>@if (!string.IsNullOrWhiteSpace(Model.Author.AvatarUrl)) { <img class="rail-avatar avatar-image @(isAdminPost ? "admin-avatar" : "")" src="@Model.Author.AvatarUrl" alt="Ảnh đại diện @Model.Author.FullName" /> } else { <span class="rail-avatar @(isAdminPost ? "admin-avatar" : "")">@Model.Author.FullName[..1].ToUpper()</span> }<small data-follow-label>Theo dõi</small></button></form> }
+        else { <a class="rail-action" asp-controller="Profile" asp-action="Index" asp-route-id="@Model.AuthorId">@if (!string.IsNullOrWhiteSpace(Model.Author.AvatarUrl)) { <img class="rail-avatar avatar-image" src="@Model.Author.AvatarUrl" alt="Ảnh đại diện @Model.Author.FullName" /> } else { <span class="rail-avatar">@Model.Author.FullName[..1].ToUpper()</span> }<small>Hồ sơ</small></a> }
+        @if (User.Identity?.IsAuthenticated == true) { <form asp-action="ToggleLike" method="post" data-async="like"><input type="hidden" name="id" value="@Model.Id" /><input type="hidden" name="returnSlug" value="@Model.Slug" /><button class="rail-action" data-rail-like><span class="rail-icon">@(isLiked ? "♥" : "♡")</span><strong data-like-count="@Model.Id">@likeCount</strong><small data-like-label>@(isLiked ? "Đã thích" : "Thích")</small></button></form> }
+        else { <a class="rail-action" asp-controller="Account" asp-action="Login"><span class="rail-icon">♡</span><strong>@likeCount</strong><small>Thích</small></a> }
+        <a class="rail-action" href="#binh-luan"><span class="rail-icon">●●●</span><strong>@Model.Comments.Count</strong><small>Bình luận</small></a>
+    </aside>
+</div>
+@if (ViewBag.CanEdit is not true && User.Identity?.IsAuthenticated == true) { <section class="report-post"><details><summary>Báo cáo bài viết</summary><form asp-action="Report" method="post"><textarea name="reason" maxlength="500" required placeholder="Lý do báo cáo..."></textarea><input type="hidden" name="postId" value="@Model.Id" /><input type="hidden" name="returnSlug" value="@Model.Slug" /><button class="danger-link">Gửi báo cáo</button></form></details></section> }
+<section class="comments-section" id="binh-luan">
+    <h2>Bình luận (<span data-comment-count>@Model.Comments.Count</span>)</h2>
+    @if (TempData["CommentError"] is string error) { <p class="form-error">@error</p> }
+    @if (isAdminPost && !User.IsInRole("Admin")) { <p class="comment-restricted">Bài thông báo của Quản trị viên chỉ mở bình luận cho Quản trị viên.</p> }
+    else if (User.Identity?.IsAuthenticated == true) { <form asp-action="AddComment" method="post" enctype="multipart/form-data" class="comment-form" data-async="comment"><input type="hidden" name="postId" value="@Model.Id" /><input type="hidden" name="returnSlug" value="@Model.Slug" /><textarea name="content" maxlength="2000" placeholder="Viết bình luận của bạn..."></textarea><div class="comment-media-inputs"><label>Ảnh<input name="image" type="file" accept="image/jpeg,image/png,image/webp" /></label><label>Video<input name="video" type="file" accept="video/mp4,video/webm" /></label></div><button class="button primary">Gửi bình luận</button></form> }
+    else { <p>Bạn cần <a asp-controller="Account" asp-action="Login">đăng nhập</a> để bình luận.</p> }
+    <div data-comment-list>
+        @foreach (var comment in Model.Comments.OrderByDescending(item => item.CreatedAt))
+        {
+            <article class="comment-item" data-comment-id="@comment.Id">
+                @if (!string.IsNullOrWhiteSpace(comment.User.AvatarUrl)) { <img class="avatar avatar-image" src="@comment.User.AvatarUrl" alt="Ảnh đại diện @comment.User.FullName" /> } else { <span class="avatar">@comment.User.FullName[..1].ToUpper()</span> }
+                <div><a class="author-link" asp-controller="Profile" asp-action="Index" asp-route-id="@comment.UserId">@comment.User.FullName</a><small>@comment.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small><p>@comment.Content</p>@if (!string.IsNullOrWhiteSpace(comment.ImageUrl)) { <img class="comment-media" src="@comment.ImageUrl" alt="Ảnh bình luận" /> }@if (!string.IsNullOrWhiteSpace(comment.VideoUrl)) { <video class="comment-media" controls preload="metadata" src="@comment.VideoUrl"></video> }</div>
+            </article>
+        }
+    </div>
+</section>

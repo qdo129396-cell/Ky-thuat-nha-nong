@@ -1,0 +1,29 @@
+@model NongKyCommunity.Web.ViewModels.CommunityRightSidebarViewModel
+<aside class="community-right">
+    <section class="community-notifications">
+        <h3>Thông báo từ Quản trị viên</h3>
+        @if (Model.Notifications.Count == 0)
+        {
+            <span>Chưa có thông báo mới.</span>
+        }
+        else
+        {
+            @foreach (var notification in Model.Notifications)
+            {
+                <article class="notification-item">
+                    <a asp-controller="Posts" asp-action="Details" asp-route-slug="@notification.Slug"><strong>@notification.Title</strong><small>@notification.CreatedAt.ToString("dd/MM/yyyy")</small></a>
+                    <p>@notification.Content</p>
+                </article>
+            }
+        }
+    </section>
+    <section>
+        <h3>Cây trồng phổ biến</h3>
+        @if (Model.Crops.Count == 0) { <span>Đang cập nhật</span> }
+        else { @foreach (var crop in Model.Crops) { <a asp-controller="Posts" asp-action="Index" asp-route-crop="@crop.Slug">@crop.Name</a> } }
+    </section>
+    <section>
+        <h3>Thành viên tích cực</h3>
+        @foreach (var member in Model.Members) { <span><strong>@member.FullName</strong> · @member.PostCount bài viết</span> }
+    </section>
+</aside>

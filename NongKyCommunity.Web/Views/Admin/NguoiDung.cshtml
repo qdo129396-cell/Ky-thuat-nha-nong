@@ -1,0 +1,8 @@
+@model IEnumerable<NongKyCommunity.Web.Models.AppUser>
+@{ ViewData["Title"] = "Người dùng"; var counts = ViewBag.PostCounts as IDictionary<int, int> ?? new Dictionary<int, int>(); }
+
+<section class="admin-page"><h1>Quản lý người dùng</h1>
+    <nav class="admin-nav"><a asp-action="Index">Tổng quan</a><a asp-action="Posts">Bài viết</a><a asp-action="Comments">Bình luận</a><a asp-action="Categories">Danh mục</a><a asp-action="Crops">Loại cây</a></nav>
+    <form method="get" class="admin-search"><input name="search" value="@ViewBag.Search" placeholder="Tìm tên hoặc email" /><button>Tìm kiếm</button></form>
+    <table class="admin-table"><thead><tr><th>Họ tên</th><th>Email</th><th>Vai trò</th><th>Bài viết</th><th>Ngày tạo</th></tr></thead><tbody>@foreach (var user in Model) { <tr><td>@user.FullName</td><td>@user.Email</td><td>@user.Role</td><td>@(counts.TryGetValue(user.Id, out var total) ? total : 0)</td><td>@user.CreatedAt.ToString("dd/MM/yyyy")</td></tr> }</tbody></table>
+</section>

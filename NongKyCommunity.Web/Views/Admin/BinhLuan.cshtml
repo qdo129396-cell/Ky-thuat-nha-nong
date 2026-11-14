@@ -1,0 +1,8 @@
+@model IEnumerable<NongKyCommunity.Web.Models.Comment>
+@{ ViewData["Title"] = "Quản lý bình luận"; }
+
+<section class="admin-page"><h1>Quản lý bình luận</h1>
+    <nav class="admin-nav"><a asp-action="Index">Tổng quan</a><a asp-action="Users">Người dùng</a><a asp-action="Posts">Bài viết</a><a asp-action="Categories">Danh mục</a><a asp-action="Crops">Loại cây</a></nav>
+    <form method="get" class="admin-search"><input name="search" value="@ViewBag.Search" placeholder="Tìm bình luận" /><button>Tìm kiếm</button></form>
+    <table class="admin-table"><thead><tr><th>Người gửi</th><th>Nội dung</th><th>Bài viết</th><th>Ngày</th><th></th></tr></thead><tbody>@foreach (var comment in Model) { <tr><td>@comment.User.FullName</td><td>@comment.Content</td><td>@comment.Post.Title</td><td>@comment.CreatedAt.ToString("dd/MM/yyyy")</td><td><form asp-action="DeleteComment" method="post" onsubmit="return confirm('Xóa bình luận này?');"><input type="hidden" name="id" value="@comment.Id" /><button class="admin-danger">Xóa</button></form></td></tr> }</tbody></table>
+</section>
